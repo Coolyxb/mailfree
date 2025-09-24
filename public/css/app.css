@@ -1380,7 +1380,7 @@ select:disabled{
 
 .btn{
   background: var(--primary);
-  color: #fff;
+  color: #000;
   border: 1px solid var(--primary);
   border-radius: var(--radius-sm);
   padding: 12px 20px;

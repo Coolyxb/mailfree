@@ -106,7 +106,7 @@
     "previousPage": "上一页",
     "nextPage": "下一页",
     "resetPassword": "重置邮箱密码",
-    "resetPasswordDescription": "将把该邮箱的密码重置为"默认"（即邮箱地址本身）。",
+    "resetPasswordDescription": "将把该邮箱的密码重置为'默认'（即邮箱地址本身）。",
     "emailAddress": "邮箱地址",
     "cancel": "取消",
     "confirmReset": "确定重置",

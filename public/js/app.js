@@ -304,6 +304,29 @@ const templateResp = await fetch('/html/app.html', { cache: 'force-cache' }).cat
 const __templateHtml = templateResp && templateResp.ok ? await templateResp.text() : await (await fetch('/html/app.html', { cache: 'no-cache' })).text();
 app.innerHTML = __templateHtml;
 
+// 在模板注入后，确保 i18n 与语言切换器正确绑定并应用当前语言
+try {
+  if (window.i18n) {
+    // 重新应用翻译到新注入的 DOM
+    try { window.i18n.applyLanguage(); } catch(_) {}
+    // 重新绑定语言切换按钮（模板动态注入后之前可能未绑定）
+    try { window.i18n.setupLanguageSwitcher(); } catch(_) {}
+    // 更新右上角按钮文字
+    try { window.i18n.updateLanguageSwitcher(); } catch(_) {}
+  } else {
+    // 若 i18n 尚未初始化，稍后重试一次
+    setTimeout(() => {
+      try {
+        if (window.i18n) {
+          window.i18n.applyLanguage();
+          window.i18n.setupLanguageSwitcher();
+          window.i18n.updateLanguageSwitcher();
+        }
+      } catch(_) {}
+    }, 100);
+  }
+} catch(_) { }
+
 const els = {
   email: document.getElementById('email'),
   gen: document.getElementById('gen'),

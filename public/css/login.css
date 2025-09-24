@@ -211,7 +211,7 @@ h1 {
   border: 1px solid var(--primary);
   border-radius: var(--radius-sm);
   background: var(--primary);
-  color: #fff;
+  color: #000;
   cursor: pointer;
   font-weight: 700;
   font-size: 16px;
