@@ -398,6 +398,11 @@ function applySessionUI(s){
       else if (s.role === 'user'){ badge.classList.add('role-user'); badge.textContent = `用户：${s.username||''}`; }
       else if (s.role === 'guest'){ badge.classList.add('role-user'); badge.textContent = '演示模式'; }
     }
+    // 普通用户使用简洁主页：隐藏配置区并居中核心操作
+    try{
+      document.body.classList.remove('user-simple');
+      if (s && s.role === 'user' && !s.strictAdmin){ document.body.classList.add('user-simple'); }
+    }catch(_){ }
     if (s && (s.strictAdmin || s.role === 'guest') && adminLink){ adminLink.style.display = 'inline-flex'; } else if (adminLink){ adminLink.style.display = 'none'; }
     if (allMailboxesLink){
       if (s && (s.strictAdmin || s.role === 'guest')) allMailboxesLink.style.display = 'inline-flex';

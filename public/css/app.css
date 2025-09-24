@@ -1109,6 +1109,13 @@ body::before{
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* 普通用户简洁模式：隐藏配置区，整体居中 */
+body.user-simple .mailbox-config-section{ display:none !important; }
+body.user-simple .mailbox-layout{ grid-template-columns: 1fr; justify-items: center; }
+body.user-simple .mailbox-display-section{ max-width: 560px; width: 100%; margin: 0 auto; }
+body.user-simple .mailbox-actions{ grid-template-columns: 1fr 1fr !important; justify-items: stretch; }
+body.user-simple .email-display{ text-align: center; }
+
 .mailbox-display-section{
   display: flex;
   flex-direction: column;

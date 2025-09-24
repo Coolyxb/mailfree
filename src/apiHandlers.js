@@ -134,7 +134,10 @@ export async function handleApiRequest(request, db, mailDomains, options = { moc
       const exists = (globalThis.__MOCK_USERS__ || []).some(u => u.username === username);
       if (exists) return new Response('用户名已存在', { status: 400 });
       const role = (body.role === 'admin') ? 'admin' : 'user';
-      const mailbox_limit = Math.max(0, Number(body.mailboxLimit || 10));
+      // 普通用户在未传 mailboxLimit 时默认 1，否则按传入；管理员默认 10
+      const mailbox_limit = (typeof body.mailboxLimit !== 'undefined' && body.mailboxLimit !== null && body.mailboxLimit !== '')
+        ? Math.max(0, Number(body.mailboxLimit))
+        : (role === 'user' ? 1 : 10);
       const id = ++globalThis.__MOCK_USER_LAST_ID__;
       const item = { id, username, role, can_send: 0, mailbox_limit, created_at: new Date().toISOString().replace('T',' ').slice(0,19) };
       globalThis.__MOCK_USERS__.unshift(item);
@@ -235,7 +238,10 @@ export async function handleApiRequest(request, db, mailDomains, options = { moc
       const body = await request.json();
       const username = String(body.username || '').trim();
       const role = (body.role || 'user') === 'admin' ? 'admin' : 'user';
-      const mailboxLimit = Number(body.mailboxLimit || 10);
+      // 普通用户在未传 mailboxLimit 时默认 1，否则按传入；管理员默认 10
+      const mailboxLimit = (typeof body.mailboxLimit !== 'undefined' && body.mailboxLimit !== null && body.mailboxLimit !== '')
+        ? Number(body.mailboxLimit)
+        : (role === 'user' ? 1 : 10);
       const password = String(body.password || '').trim();
       let passwordHash = null;
       if (password){ passwordHash = await sha256Hex(password); }
