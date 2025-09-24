@@ -3,13 +3,16 @@ class I18n {
   constructor() {
     this.currentLanguage = localStorage.getItem('language') || 'zh';
     this.translations = {};
+    this.isInitialized = false;
     this.init();
   }
 
   async init() {
+    console.log('I18n initializing with language:', this.currentLanguage);
     await this.loadTranslations();
     this.applyLanguage();
     this.setupLanguageSwitcher();
+    this.isInitialized = true;
     
     // Ensure language switcher is updated after setup
     setTimeout(() => {
@@ -19,8 +22,13 @@ class I18n {
 
   async loadTranslations() {
     try {
+      console.log('Loading translations for:', this.currentLanguage);
       const response = await fetch(`/js/locales/${this.currentLanguage}.json`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
       this.translations = await response.json();
+      console.log('Translations loaded:', this.translations);
     } catch (error) {
       console.error('Failed to load translations:', error);
       // Fallback to Chinese if English fails
@@ -61,6 +69,9 @@ class I18n {
   }
 
   applyLanguage() {
+    console.log('Applying language:', this.currentLanguage);
+    console.log('Available translations:', Object.keys(this.translations));
+    
     // Update document title
     document.title = this.t('page.title');
     
@@ -68,6 +79,7 @@ class I18n {
     document.querySelectorAll('[data-i18n]').forEach(element => {
       const key = element.getAttribute('data-i18n');
       const text = this.t(key);
+      console.log(`Updating element with key ${key}: ${text}`);
       
       if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
         element.placeholder = text;
@@ -92,17 +104,23 @@ class I18n {
     // Update elements with data-i18n-placeholder for placeholder attributes
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
       const key = element.getAttribute('data-i18n-placeholder');
-      element.placeholder = this.t(key);
+      const text = this.t(key);
+      console.log(`Updating placeholder with key ${key}: ${text}`);
+      element.placeholder = text;
     });
   }
 
   setupLanguageSwitcher() {
     const switcher = document.getElementById('language-switcher');
     if (switcher) {
+      console.log('Setting up language switcher');
       switcher.addEventListener('click', () => {
         const newLang = this.currentLanguage === 'zh' ? 'en' : 'zh';
+        console.log('Switching language from', this.currentLanguage, 'to', newLang);
         this.switchLanguage(newLang);
       });
+    } else {
+      console.log('Language switcher not found');
     }
   }
 
@@ -110,25 +128,34 @@ class I18n {
     const switcher = document.getElementById('language-switcher');
     if (switcher) {
       const text = switcher.querySelector('.btn-text');
-      
-      if (this.currentLanguage === 'zh') {
-        text.textContent = 'English';
+      if (text) {
+        if (this.currentLanguage === 'zh') {
+          text.textContent = 'English';
+        } else {
+          text.textContent = '中文';
+        }
+        console.log('Updated language switcher text to:', text.textContent);
       } else {
-        text.textContent = '中文';
+        console.log('Language switcher text element not found');
       }
+    } else {
+      console.log('Language switcher not found for update');
     }
   }
 }
 
-// Initialize i18n immediately
-window.i18n = new I18n();
-
-// Also initialize when DOM is loaded as a fallback
-document.addEventListener('DOMContentLoaded', () => {
-  if (!window.i18n) {
+// Initialize i18n when DOM is ready
+function initializeI18n() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      window.i18n = new I18n();
+    });
+  } else {
     window.i18n = new I18n();
   }
-});
+}
+
+initializeI18n();
 
 // Export for module usage
 if (typeof module !== 'undefined' && module.exports) {
