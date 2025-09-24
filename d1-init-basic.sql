@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT,
   role TEXT NOT NULL DEFAULT 'user',
   can_send INTEGER NOT NULL DEFAULT 0,
-  mailbox_limit INTEGER NOT NULL DEFAULT 10,
+  mailbox_limit INTEGER NOT NULL DEFAULT 1,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);

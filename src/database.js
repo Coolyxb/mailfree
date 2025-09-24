@@ -285,7 +285,7 @@ export async function ensureUsersTables(db){
     "password_hash TEXT," +
     "role TEXT NOT NULL DEFAULT 'user'," +
     "can_send INTEGER NOT NULL DEFAULT 0," +
-    "mailbox_limit INTEGER NOT NULL DEFAULT 10," +
+    "mailbox_limit INTEGER NOT NULL DEFAULT 1," +
     "created_at TEXT DEFAULT CURRENT_TIMESTAMP" +
     ")"
   );
