@@ -1,0 +1,248 @@
+<div class="topbar">
+  <div class="brand">
+    <span class="brand-icon">📧</span>
+    <span class="brand-text" data-i18n="topbar.brand">Cursor Pro Trial</span>
+  </div>
+  <div id="role-badge" class="role-badge" data-i18n-title="topbar.welcome"></div>
+  <div class="nav-actions">
+    <button id="language-switcher" class="btn btn-ghost" title="Switch Language">
+      <span class="btn-icon">🇺🇸</span>
+      <span class="btn-text">English</span>
+    </button>
+    <a id="admin" class="btn btn-ghost" href="/templates/loading.html?redirect=%2Fadmin.html&status=%E6%AD%A3%E5%9C%A8%E6%A0%A1%E9%AA%8C%E6%9D%83%E9%99%90%E2%80%A6" data-i18n-title="topbar.admin" style="display:none">
+      <span class="btn-icon">🛠️</span>
+      <span class="btn-text" data-i18n="topbar.admin">用户管理</span>
+    </a>
+    <a id="all-mailboxes" class="btn btn-ghost" href="/templates/loading.html?redirect=%2Fhtml%2Fmailboxes.html&status=%E6%AD%A3%E5%9C%A8%E6%89%93%E5%BC%80%E9%82%AE%E7%AE%B1%E6%80%BB%E8%A7%88%E9%A1%B5%E9%9D%A2%E2%80%A6" data-i18n-title="topbar.allMailboxes" style="display:none">
+      <span class="btn-icon">📦</span>
+      <span class="btn-text" data-i18n="topbar.allMailboxes">所有邮箱</span>
+    </a>
+    <button id="logout" class="btn btn-secondary" data-i18n-title="topbar.logout">
+      <span class="btn-icon">🚪</span>
+      <span class="btn-text" data-i18n="topbar.logout">退出登录</span>
+    </button>
+  </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="container">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3>
+          <span class="sidebar-icon">📨</span>
+          <span class="sidebar-title" data-i18n="app.historyMailboxes">历史邮箱</span>
+        </h3>
+        <div class="sidebar-header-actions">
+          <span id="quota" class="quota-display"></span>
+          <button id="sidebar-toggle" class="sidebar-toggle-btn" data-i18n-title="app.collapseSidebar">
+            <span id="sidebar-toggle-icon">◀</span>
+          </button>
+          <button id="mb-toggle" class="sidebar-toggle-btn" data-i18n-title="app.toggleHistoryMailboxes">
+            <span id="mb-toggle-icon">▾</span>
+          </button>
+        </div>
+      </div>
+      <div class="sidebar-search">
+        <input id="mb-search" class="input sidebar-search-input" data-i18n-placeholder="app.searchHistoryMailboxes" placeholder="搜索历史邮箱" />
+      </div>
+      <div id="mb-list"></div>
+      <div id="mb-loading" style="margin-top:12px"></div>
+      <div id="mb-more-wrap" style="margin-top:16px;text-align:center;display:none">
+        <button id="mb-more" class="btn btn-ghost btn-sm" style="width:100%">
+          <span id="mb-more-text" data-i18n="app.loadMore">加载更多</span>
+        </button>
+      </div>
+    </div>
+    <div class="main">
+      <div class="card generate-card">
+        <h2>
+          <span class="card-icon">✨</span>
+          <span data-i18n="app.generateEmail">生成临时邮箱</span>&nbsp;&nbsp;&nbsp;&nbsp;<span data-i18n="app.qqGroup">Cursor Pro Trial 交流QQ群：626760014</span>
+        </h2>
+        
+        <div class="mailbox-layout">
+          <!-- 左侧：邮箱地址展示 -->
+          <div class="mailbox-display-section">
+            <div class="mailbox-display-content">
+              <div class="section-header">
+                <span class="section-icon">📧</span>
+                <span class="section-title" data-i18n="app.currentEmail">当前邮箱</span>
+              </div>
+              <div id="email" class="email-display">
+                <span id="email-text" class="email-text"><span class="placeholder-text" data-i18n="app.clickToGenerate">点击右侧生成按钮创建邮箱地址</span></span>
+                <div id="custom-overlay" class="custom-overlay" style="display:none">
+                  <input id="custom-local-overlay" class="input custom-input" type="text" data-i18n-placeholder="app.customInputPlaceholder" placeholder="仅限字母/数字/._-" />
+                  <button id="create-custom-overlay" class="btn btn-primary btn-sm" data-i18n="common.create">创建</button>
+                </div>
+              </div>
+            </div>
+            <div class="mailbox-actions" id="email-actions" style="display:none">
+              <button id="copy" class="btn btn-secondary" style="width:100%">
+                <span class="btn-icon">📋</span>
+                <span data-i18n="app.copyEmail">复制邮箱 ✨</span>
+              </button>
+              <button id="compose" class="btn btn-primary" style="width:100%">
+                <span class="btn-icon">✉️</span>
+                <span data-i18n="app.compose">发邮件</span>
+              </button>
+              <button id="clear" class="btn btn-danger" style="width:100%">
+                <span class="btn-icon">🗑️</span>
+                <span data-i18n="app.clearEmails">清空邮件 💥</span>
+              </button>
+              <button id="refresh" class="btn btn-ghost" style="width:100%">
+                <span class="btn-icon">🔄</span>
+                <span data-i18n="app.refreshEmails">刷新邮件 📬</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- 右侧：邮箱配置 -->
+          <div class="mailbox-config-section">
+            <div class="section-header">
+              <span class="section-icon">⚙️</span>
+              <span class="section-title" data-i18n="app.emailConfig">邮箱配置</span>
+              <button id="config-toggle" class="sidebar-toggle-btn" data-i18n-title="app.toggleConfig">
+                <span id="config-toggle-icon">▾</span>
+              </button>
+            </div>
+            <div class="config-form">
+              <div class="config-item">
+                <label class="config-label">
+                  <span class="label-icon">🌐</span>
+                  <span data-i18n="app.emailSuffix">邮箱后缀</span>
+                </label>
+                <select id="domain-select" class="select config-select"></select>
+              </div>
+              <div class="config-item">
+                <label class="config-label">
+                  <span class="label-icon">📏</span>
+                  <span data-i18n="app.usernameLength">用户名长度</span>
+                </label>
+                <div class="range-container">
+                  <input id="len-range" class="range" type="range" min="8" max="30" step="1" value="8" />
+                  <div class="range-display">
+                    <span id="len-val" class="len-value">8</span>
+                    <span class="len-unit" data-i18n="app.characters">位</span>
+                  </div>
+                </div>
+              </div>
+               <div class="generate-action">
+                 <div class="generate-buttons" style="display: flex; gap: 8px; margin-bottom: 8px; width: 100%;">
+                   <button id="gen" class="btn btn-generate" style="flex: 1;">
+                     <span class="btn-icon">🎲</span>
+                     <span data-i18n="app.randomGenerate">随机生成</span>
+                   </button>
+                   <button id="gen-name" class="btn btn-primary" style="flex: 1;" data-i18n-title="app.randomNameTooltip">
+                     <span class="btn-icon">👤</span>
+                     <span data-i18n="app.randomName">随机人名</span>
+                   </button>
+                 </div>
+                 <button id="toggle-custom" class="btn btn-secondary btn-sm" style="width: 100%;" data-i18n-title="app.customEmailTooltip" data-i18n="app.customEmail">切换自定义</button>
+               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card inbox-card" id="list-card" style="display:none">
+        <div class="listcard-header">
+          <h2 class="listcard-title">
+            <span class="card-icon" id="box-icon">📬</span>
+            <span id="box-title" data-i18n="app.inbox">收件箱</span>
+          </h2>
+          <div class="view-switch">
+            <button id="tab-inbox" class="seg-btn" aria-pressed="true" data-i18n="app.inbox">收件箱</button>
+            <button id="tab-sent" class="seg-btn" aria-pressed="false" data-i18n="app.sent">发件箱</button>
+          </div>
+          <div id="list-loading" class="loading-indicator" style="pointer-events:none" role="status" aria-live="polite">
+            <div class="spinner"></div>
+            <span data-i18n="app.loading">加载中…</span>
+          </div>
+        </div>
+        <div class="list-viewport" style="position:relative;contain:layout paint;isolation:isolate;">
+          <div id="list" class="list"></div>
+          <div id="list-pager" class="pager" style="display:none">
+            <button id="prev-page" class="btn btn-ghost btn-sm" data-i18n="app.previousPage">上一页</button>
+            <span id="page-info" class="muted" style="min-width:100px;text-align:center"></span>
+            <button id="next-page" class="btn btn-ghost btn-sm" data-i18n="app.nextPage">下一页</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-slot"></div>
+
+  <div class="modal" id="email-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div id="modal-subject">
+          <span class="modal-icon">📧</span>
+          <span data-i18n="app.emailDetails">邮件详情</span>
+        </div>
+        <button id="modal-close" class="close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="confirm-modal">
+    <div class="modal-card confirm-card">
+      <div class="modal-header confirm-header">
+        <div>
+          <span class="modal-icon">⚠️</span>
+          <span data-i18n="app.confirm">确认操作</span>
+        </div>
+        <button id="confirm-close" class="close">✕</button>
+      </div>
+      <div class="modal-body confirm-body">
+        <div id="confirm-message" class="confirm-message"></div>
+        <div class="confirm-actions">
+          <button id="confirm-cancel" class="btn btn-secondary" data-i18n="common.cancel">取消</button>
+          <button id="confirm-ok" class="btn btn-danger" data-i18n="common.ok">确定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="compose-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="modal-icon">✉️</span>
+          <span data-i18n="app.newEmail">新邮件</span>
+        </div>
+        <button id="compose-close" class="close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="compose-form">
+          <div class="field-group">
+            <label class="field-label" data-i18n="app.recipients">收件人</label>
+            <input id="compose-to" class="input field-input" type="text" data-i18n-placeholder="app.recipientsPlaceholder" placeholder="foo@example.com, bar@example.com" />
+            <div class="field-hint" data-i18n="app.recipientsHint">多个地址请以逗号分隔</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" data-i18n="app.senderName">发件名称（可选）</label>
+            <input id="compose-from-name" class="input field-input" type="text" data-i18n-placeholder="app.senderNamePlaceholder" placeholder="例如：iDing 支持团队" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" data-i18n="app.subject">主题</label>
+            <input id="compose-subject" class="input field-input" type="text" data-i18n-placeholder="app.subjectPlaceholder" placeholder="主题" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" data-i18n="app.content">内容</label>
+            <textarea id="compose-body" class="textarea field-textarea" rows="10" data-i18n-placeholder="app.contentPlaceholder" placeholder="请输入邮件内容"></textarea>
+          </div>
+          <div class="compose-actions">
+            <button id="compose-cancel" class="btn btn-secondary" data-i18n="common.cancel">取消</button>
+            <button id="compose-send" class="btn btn-primary" data-i18n="app.send">发送</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/i18n.js"></script>
+  
+
+

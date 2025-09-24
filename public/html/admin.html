@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="precheck-hide">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-i18n="admin.title">用户管理 - Cursor Pro Trial</title>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <noscript>
+      <meta http-equiv="refresh" content="0; url=/templates/loading.html?redirect=%2Fhtml%2Fadmin.html" />
+    </noscript>
+    <style>.precheck-hide body{ visibility: hidden !important; }</style>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/css/app.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <script src="/js/auth-guard.js" defer></script>
+    <script src="/js/i18n.js" defer></script>
+    <script>
+      // 访问管理页先做前端快速鉴权，避免内容闪现；未登录或权限不足均进入 loading 或回首页
+      (function(){
+        fetch('/api/session', { headers: { 'Cache-Control': 'no-cache' } })
+          .then(r => r.ok ? r.json() : Promise.reject('unauth'))
+          .then(s => {
+            if (s && (s.role === 'admin' || s.role === 'guest' || s.strictAdmin)){
+              try{ document.documentElement.classList.remove('precheck-hide'); }catch(_){ }
+              return;
+            }
+            // 已登录但无权限：回首页
+            location.replace('/');
+          })
+          .catch(() => {
+            // 未登录：进入加载页做鉴权
+            if (window.AuthGuard) { window.AuthGuard.goLoading('/html/admin.html', '正在校验权限…'); }
+            else { location.replace('/templates/loading.html?redirect=%2Fhtml%2Fadmin.html&status=' + encodeURIComponent('正在校验权限…')); }
+          });
+      })();
+    </script>
+  </head>
+  <body class="admin-page">
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-icon">🛠️</span>
+        <span data-i18n="topbar.userManagement">Cursor Pro Trial - 用户管理</span>
+      </div>
+      <div class="nav-actions">
+        <button id="language-switcher" class="btn btn-ghost" title="Switch Language">
+          <span class="btn-icon">🇺🇸</span>
+          <span class="btn-text">English</span>
+        </button>
+        <button id="back" class="btn btn-ghost" data-i18n-title="admin.backToMailbox" data-i18n="admin.backToMailbox">返回邮箱</button>
+        <button id="logout" class="btn btn-secondary" data-i18n-title="topbar.logout" data-i18n="topbar.logout">退出登录</button>
+      </div>
+    </div>
+    <div id="demo-banner" class="demo-banner" style="display:none">当前为演示管理页：所有改动仅在浏览器会话中模拟</div>
+    <div class="admin-container">
+      <div class="admin-left">
+        <div class="card">
+          <h2><span class="card-icon">👤</span><span data-i18n="admin.userManagement">用户管理</span></h2>
+          <div class="generate-action"><button id="u-open" class="btn btn-primary" data-i18n="admin.createUser">创建用户</button></div>
+          <div class="generate-action"><button id="a-open" class="btn btn-primary" data-i18n="admin.assignMailbox">分配邮箱</button></div>
+        </div>
+   
+        <div class="card">
+          <h2><span class="card-icon">📦</span><span data-i18n="admin.userMailboxes">用户的邮箱列表</span></h2>
+          <div id="user-mailboxes-loading" class="loading-indicator" style="margin: 4px 0 8px 0; display:none">
+            <div class="spinner"></div>
+            <span data-i18n="admin.loading">加载中…</span>
+          </div>
+          <div id="user-mailboxes"></div>
+        </div>
+      </div>
+      <div class="admin-right">
+        <div class="card">
+          <div class="card-header">
+            <h2><span class="card-icon">📋</span><span data-i18n="admin.userList">用户列表</span></h2>
+            <button id="users-refresh" class="btn btn-ghost btn-sm" data-i18n-title="admin.refreshTooltip" data-i18n="admin.refresh">刷新</button>
+          </div>
+          <div id="users-loading" class="loading-indicator" style="margin: 4px 0 8px 0">
+            <div class="spinner"></div>
+            <span data-i18n="admin.loading">加载中…</span>
+          </div>
+          <div style="overflow:auto; max-height: 420px">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th class="col-id" style="text-align:left;padding:8px;border-bottom:1px solid var(--border-light)" data-i18n="admin.id">ID</th>
+                  <th class="col-username" style="text-align:left;padding:8px;border-bottom:1px solid var(--border-light)" data-i18n="admin.username">用户名</th>
+                  <th class="col-role" style="text-align:left;padding:8px;border-bottom:1px solid var(--border-light)" data-i18n="admin.role">角色</th>
+                  <th class="col-mailbox" style="text-align:left;padding:8px;border-bottom:1px solid var(--border-light)" data-i18n="admin.mailboxCount">邮箱数量</th>
+                  <th class="col-can" style="text-align:left;padding:8px;border-bottom:1px solid var(--border-light)" data-i18n="admin.canSend">能否发件</th>
+                  <th class="col-created" style="text-align:left;padding:8px;border-bottom:1px solid var(--border-light)" data-i18n="admin.createdTime">创建时间</th>
+                  <th class="col-actions" style="text-align:left;padding:8px;border-bottom:1px solid var(--border-light)" data-i18n="admin.actions">操作</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="toast" class="toast"></div>
+
+      <!-- 编辑用户 二级页面 -->
+      <div class="modal" id="edit-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div>
+              <span class="modal-icon">🛠️</span>
+              <span data-i18n="admin.editUser">编辑用户</span>
+              <span id="edit-user-display" class="user-chip"></span>
+            </div>
+            <button id="edit-close" class="close">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-grid">
+              <div>
+                <label class="config-label" data-i18n="admin.newPassword">新密码</label>
+                <input id="edit-pass" class="input" type="password" data-i18n-placeholder="admin.newPasswordPlaceholder" placeholder="留空则不修改" />
+              </div>
+              <div>
+                <label class="config-label" data-i18n="admin.newUsername">新用户名</label>
+                <input id="edit-new-name" class="input" data-i18n-placeholder="admin.newUsernamePlaceholder" placeholder="留空则不修改" />
+              </div>
+              <div>
+                <label class="config-label" data-i18n="admin.mailboxLimit">邮箱上限</label>
+                <input id="edit-limit" class="input" type="number" min="0" />
+              </div>
+            </div>
+            <div class="checks-row">
+              <label class="toggle"><input id="edit-role-check" type="checkbox" /><span data-i18n="admin.advancedUser">高级用户</span></label>
+              <label class="toggle"><input id="edit-send-check" type="checkbox" /><span data-i18n="admin.allowSend">允许发件</span></label>
+            </div>
+          </div>
+          <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:12px 16px">
+            <button id="edit-cancel" class="btn btn-secondary" data-i18n="common.cancel">取消</button>
+            <button id="edit-save" class="btn btn-primary" data-i18n="common.save">保存</button>
+            <button id="edit-delete" class="btn btn-danger" data-i18n="admin.deleteUser">删除用户</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 自定义确认对话框（删除用户） -->
+      <div class="modal" id="admin-confirm-modal">
+        <div class="modal-card confirm-card">
+          <div class="modal-header confirm-header">
+            <div>
+              <span class="modal-icon">⚠️</span>
+              <span data-i18n="admin.confirmOperation">确认操作</span>
+            </div>
+            <button id="admin-confirm-close" class="close">✕</button>
+          </div>
+          <div class="modal-body confirm-body">
+            <div id="admin-confirm-message" class="confirm-message"></div>
+            <div class="confirm-actions">
+              <button id="admin-confirm-cancel" class="btn btn-secondary" data-i18n="common.cancel">取消</button>
+              <button id="admin-confirm-ok" class="btn btn-danger" data-i18n="common.ok">确定</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal" id="u-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div>
+              <span class="modal-icon">👤</span>
+              <span data-i18n="admin.createUserTitle">创建用户</span>
+            </div>
+            <button id="u-close" class="close">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="config-form">
+              <div class="config-item"><label class="config-label" data-i18n="admin.usernameLabel">用户名</label><input id="u-name" class="input" data-i18n-placeholder="admin.usernamePlaceholder" placeholder="username" /></div>
+              <div class="config-item"><label class="config-label" data-i18n="admin.passwordLabel">密码</label><input id="u-pass" class="input" type="password" data-i18n-placeholder="admin.passwordPlaceholder" placeholder="password" /></div>
+              <div class="config-item"><label class="config-label" data-i18n="admin.roleLabel">角色</label><select id="u-role" class="select"><option value="user" data-i18n="admin.normalUser">普通用户</option><option value="admin" data-i18n="admin.adminUser">高级用户</option></select></div>
+            </div>
+          </div>
+          <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:12px 16px">
+            <button id="u-cancel" class="btn btn-secondary" data-i18n="common.cancel">取消</button>
+            <button id="u-create" class="btn btn-primary" data-i18n="common.create">创建</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal" id="a-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div>
+              <span class="modal-icon">📬</span>
+              <span data-i18n="admin.assignMailboxTitle">分配邮箱</span>
+            </div>
+            <button id="a-close" class="close">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="config-form">
+              <div class="config-item"><label class="config-label" data-i18n="admin.usernameLabel">用户名</label><input id="a-name" class="input" data-i18n-placeholder="admin.usernamePlaceholder" placeholder="username" /></div>
+              <div class="config-item">
+                <label class="config-label" data-i18n="admin.mailboxAddresses">邮箱地址</label>
+                <textarea id="a-mail" class="input" data-i18n-placeholder="admin.mailboxPlaceholder" placeholder="foo@example.com&#10;bar@example.com&#10;baz@example.com" rows="4"></textarea>
+                <div class="help-text" data-i18n="admin.mailboxHint">每行一个邮箱地址，支持批量分配</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:12px 16px">
+            <button id="a-cancel" class="btn btn-secondary" data-i18n="common.cancel">取消</button>
+            <button id="a-assign" class="btn btn-primary" data-i18n="admin.assign">分配</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footer-slot"></div>
+    <script type="module" src="/js/admin.js"></script>
+    <script>
+      // 动态加载公共 footer 模板，并在宿主页面设置年份，确保执行
+      (async function(){
+        try{
+          const res = await fetch('/templates/footer.html', { cache: 'no-cache' });
+          const html = await res.text();
+          const slot = document.getElementById('footer-slot');
+          if (slot){
+            slot.outerHTML = html;
+            // 等 DOM 更新后填充年份
+            setTimeout(() => {
+              const y = document.getElementById('footer-year');
+              if (y) y.textContent = new Date().getFullYear();
+            }, 0);
+          }
+        }catch(_){ }
+      })();
+    </script>
+  </body>
+  </html>
+
+
