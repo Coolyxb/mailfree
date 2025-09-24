@@ -10,6 +10,11 @@ class I18n {
     await this.loadTranslations();
     this.applyLanguage();
     this.setupLanguageSwitcher();
+    
+    // Ensure language switcher is updated after setup
+    setTimeout(() => {
+      this.updateLanguageSwitcher();
+    }, 100);
   }
 
   async loadTranslations() {
@@ -104,23 +109,25 @@ class I18n {
   updateLanguageSwitcher() {
     const switcher = document.getElementById('language-switcher');
     if (switcher) {
-      const icon = switcher.querySelector('.btn-icon');
       const text = switcher.querySelector('.btn-text');
       
       if (this.currentLanguage === 'zh') {
-        icon.textContent = '🇺🇸';
         text.textContent = 'English';
       } else {
-        icon.textContent = '🇨🇳';
         text.textContent = '中文';
       }
     }
   }
 }
 
-// Initialize i18n when DOM is loaded
+// Initialize i18n immediately
+window.i18n = new I18n();
+
+// Also initialize when DOM is loaded as a fallback
 document.addEventListener('DOMContentLoaded', () => {
-  window.i18n = new I18n();
+  if (!window.i18n) {
+    window.i18n = new I18n();
+  }
 });
 
 // Export for module usage
